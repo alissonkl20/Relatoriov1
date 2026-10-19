@@ -10,15 +10,11 @@ class Categoria extends Model
 {
     use HasUuids;
 
-    protected $table = 'categorias';
+    public $table = 'categorias';
 
-    protected $fillable = [
+    public $fillable = [
         'nome',
     ];
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
 
     public function dashboards(): HasMany
     {

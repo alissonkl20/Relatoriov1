@@ -6,6 +6,7 @@ use App\Models\Categoria;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CategoriaController extends Controller
 {
@@ -36,19 +37,15 @@ class CategoriaController extends Controller
             ->with('success', 'Categoria criada com sucesso!');
     }
 
-    public function edit(string $id): View
+    public function edit(Categoria $categoria): View
     {
-        $categoria = Categoria::findOrFail($id);
-
         return view('categorias.edit', compact('categoria'));
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(Request $request, Categoria $categoria): RedirectResponse
     {
-        $categoria = Categoria::findOrFail($id);
-
         $validated = $request->validate([
-            'nome' => 'required|string|max:255|unique:categorias,nome,'.$categoria->id.',id',
+            'nome' => ['required', 'string', 'max:255', Rule::unique('categorias', 'nome')->ignore($categoria)],
         ]);
 
         $categoria->update($validated);
@@ -58,10 +55,8 @@ class CategoriaController extends Controller
             ->with('success', 'Categoria atualizada com sucesso!');
     }
 
-    public function destroy(string $id): RedirectResponse
+    public function destroy(Categoria $categoria): RedirectResponse
     {
-        $categoria = Categoria::findOrFail($id);
-
         if ($categoria->dashboards()->exists()) {
             return redirect()
                 ->route('categorias.index')
