@@ -8,7 +8,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -27,7 +26,7 @@ class DashboardController extends Controller
                         ->orWhere(function (Builder $query) use ($selectedCategoria): void {
                             $query->whereNull('categoria_id')
                                 ->where('categoria', $selectedCategoria->nome);
-                        });
+                        });    
                 });
             } else {
                 $selectedCategoriaId = '';
@@ -53,7 +52,7 @@ class DashboardController extends Controller
         return view('dashboard.create', compact('categorias'));
     }
 
-    public function postDashboard(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
@@ -63,7 +62,6 @@ class DashboardController extends Controller
         $categoria = Categoria::findOrFail($validated['categoria_id']);
 
         Dashboard::create([
-            'id' => (string) Str::uuid(),
             'nome' => $validated['nome'],
             'valor' => $validated['valor'],
             'categoria' => $categoria->nome,
@@ -75,9 +73,8 @@ class DashboardController extends Controller
             ->with('success', 'Registro criado com sucesso!');
     }
 
-    public function edit(string $id): View
+    public function edit(Dashboard $dashboard): View
     {
-        $dashboard = Dashboard::findOrFail($id);
         $categorias = Categoria::orderBy('nome')->get();
 
         return view('dashboard.edit', compact(
@@ -86,10 +83,8 @@ class DashboardController extends Controller
         ));
     }
 
-    public function putDashboard(Request $request, string $id): RedirectResponse
+    public function update(Request $request, Dashboard $dashboard): RedirectResponse
     {
-        $dashboard = Dashboard::findOrFail($id);
-
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'valor' => 'required|numeric|min:0',
@@ -109,10 +104,8 @@ class DashboardController extends Controller
             ->with('success', 'Registro atualizado com sucesso!');
     }
 
-    public function deleteDashboard(string $id): RedirectResponse
+    public function destroy(Dashboard $dashboard): RedirectResponse
     {
-        $dashboard = Dashboard::findOrFail($id);
-
         $dashboard->delete();
 
         return redirect()

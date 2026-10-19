@@ -10,16 +10,12 @@ class Dashboard extends Model
 {
     use HasUuids;
 
-    protected $fillable = [
+    public $fillable = [
         'nome',
         'valor',
         'categoria',
         'categoria_id',
     ];
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
 
     public function categoriaRelacionada(): BelongsTo
     {
